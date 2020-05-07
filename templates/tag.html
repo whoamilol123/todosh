@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+
+        <p>
+            {{ form.name.label }}
+            {{ form.name(class='form-control') }}
+        </p>
+        <p>
+            {{ form.color.label }}
+            {{ form.color(class='form-control', type='color') }}
+        </p>
+
+        <div class="text-center">
+            {{ form.submit(type="submit", class="btn btn-primary px-5") }}
+        </div>
+    </form>
+{% endblock %}

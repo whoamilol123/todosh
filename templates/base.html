@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    {% if title is defined %}
+        <title>{{ title if title == 'Todo.sh' else title + ' - Todo.sh' }}</title>
+    {% else %}
+        <title>Todo.sh</title>
+    {% endif %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body class="h-100 d-flex flex-column">
+<nav class="navbar navbar-light bg-light d-flex flex-row mb-2">
+    <a class="navbar-brand" href="/" title="сделал макс">Todo.sh</a>
+    {% if title != 'Todo.sh' %}
+        <div class="h5 m-0">{{ title }}</div>
+    {% endif %}
+    <div class="flex-fill"></div>
+
+    {% if current_user.is_authenticated %}
+        <div class="navbar-text">
+            <a href="/profile">{{ current_user.username }}</a>
+            (<a href="/logout">выйти</a>)
+        </div>
+    {% else %}
+        <div class="flex-shrink-1">
+            <a href="/registration" class="btn btn-outline-primary mx-2">Регистрация</a>
+            <a href="/login" class="btn btn-outline-success mx-2">Войти</a>
+        </div>
+    {% endif %}
+</nav>
+<div class="container flex-fill h-100">
+    {% block content %}{% endblock %}
+</div>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>

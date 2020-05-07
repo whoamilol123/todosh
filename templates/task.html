@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ task.title }}</h2>
+    <div class="row">
+        <div class="col-4">
+            {% if task.finished %}
+                <h5 class="text-success">Завершена</h5>
+            {% endif %}
+            <h5>Владелец: </h5>
+            <p>{{ task.owner.username }}</p>
+            <h5>Приоритет: </h5>
+            {% if task.priority < 5 %}
+                <p>{{ task.priority_text }}</p>
+            {% else %}
+                <p><b>{{ task.priority_text }}</b></p>
+            {% endif %}
+            <h5>Дедлайн: </h5>
+            {% if task.deadline is not none %}
+                <p class="{{ 'text-danger' if task.deadline_in.days < 3 and not task.finished else '' }}">
+                    {{ task.deadline.strftime('%d/%m/%Y') }}
+                    {% if task.deadline_in.days >= 0 %}
+                        (через {{ task.deadline_in.days }} дн.)
+                    {% else %}
+                        ({{ -task.deadline_in.days }} дн. назад)
+                    {% endif %}
+                </p>
+            {% else %}
+                <p>нет</p>
+            {% endif %}
+            <h5>Теги:</h5>
+            {% if task.tags %}
+                {% for tag in task.tags %}
+                    <a href="/tasks?tag_id={{ tag.id }}" class="tag{{ ' dark' if is_dark(tag.color) else '' }}"
+                       style="background-color: {{ tag.color }}">{{ tag.name }}</a>
+                {% endfor %}
+            {% else %}
+                <p class="text-secondary">пусто</p>
+            {% endif %}
+        </div>
+        <div class="col-8">
+            <div class="d-flex flex-row mb-2">
+                <div class="flex-fill"></div>
+                {% if not task.finished %}
+                    <a href="/tasks/{{ task.id }}/finish" class="btn btn-success m-2">
+                        Завершить
+                    </a>
+                {% else %}
+                    <a href="/tasks/{{ task.id }}/unfinish" class="btn btn-warning m-2">
+                        Вернуть в работу
+                    </a>
+                {% endif %}
+                <a href="/tasks/{{ task.id }}/edit" class="btn btn-outline-primary m-2">
+                    Изменить
+                </a>
+                <a href="/tasks/{{ task.id }}/delete" class="btn btn-outline-danger m-2">
+                    Удалить
+                </a>
+            </div>
+            <p>{{ task.content }}</p>
+            {% if task.place is not none %}
+                <hr>
+                <h3>Карта <small>({{ task.place.split('|')[0] }})</small></h3>
+                <img class="w-100"
+                     src="https://static-maps.yandex.ru/1.x/?ll={{ '&spn='.join(task.place.split('|')[1:]) }}&l=map">
+            {% endif %}
+            <hr>
+            <h3>Комментарии</h3>
+            <label for="comment-input">Написать комментарий</label>
+            <textarea id="comment-input" class="form-control" style="min-height: 120px; max-height: 500px;"></textarea>
+            <div class="text-right mt-2">
+                <button class="btn btn-primary px-5" id="send-comment">Отправить</button>
+            </div>
+            <div id="comments"></div>
+        </div>
+    </div>
+
+    <script>
+        function getCommentEl(comment) {
+            var root = document.createElement('div')
+            root.className = 'card my-2'
+            var innerRoot = document.createElement('div')
+            innerRoot.className = 'card-body'
+            var title = document.createElement('h5')
+            title.className = 'card-title mb-0'
+            title.appendChild(document.createTextNode(comment.sender.username))
+            var wrote = document.createElement('small')
+            wrote.innerText = ' написал'
+            title.appendChild(wrote)
+            innerRoot.appendChild(title)
+            var time = document.createElement('small')
+            time.className = 'text-secondary mb-2'
+            time.innerText = new Date(comment.time * 1000).toLocaleString('ru')
+            innerRoot.appendChild(time)
+            var content = document.createElement('p')
+            content.className = 'mb-0'
+            content.innerText = comment.content
+            innerRoot.appendChild(content)
+            root.appendChild(innerRoot)
+            return root
+        }
+
+        function loadComments() {
+            $.ajax({
+                url: '/api/comments?task_id={{ task.id }}',
+                success: function (data) {
+                    var d = data.comments
+                    d.forEach(function (com) {
+                        var el = getCommentEl(com)
+                        comments.append(el)
+                    })
+                }
+            })
+        }
+
+        var sendComment = $('#send-comment')
+        var commentInput = $('#comment-input')
+        var comments = $('#comments')
+        sendComment.click(function () {
+            sendComment.attr('disabled', true)
+            $.ajax({
+                method: 'POST',
+                url: '/api/comments',
+                data: 'task_id={{ task.id }}&content=' + encodeURIComponent(commentInput.val()),
+                success: function (data) {
+                    var el = getCommentEl(data)
+                    comments.prepend(el)
+                    sendComment.attr('disabled', false)
+                    commentInput.val('')
+                }
+            })
+        })
+        loadComments()
+    </script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-6 col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Теги</h5>
+                    <ul class="list-group">
+                        <a href="/tasks"
+                           class="list-group-item list-group-item-action{{ ' active' if selected_tag is none else '' }}">
+                            Все задачи
+                        </a>
+                        <a href="/tasks?tag_id=0"
+                           class="list-group-item list-group-item-action{{ ' active' if selected_tag == '0' else '' }}">
+                            Без тегов
+                        </a>
+                        {% for tag in tags %}
+                            {% if (tag.id | string) == selected_tag %}
+                                <a href="/tasks?tag_id={{ tag.id }}"
+                                   class="active list-group-item list-group-item-action{{ ' text-white' if is_dark(tag.color) else '' }}">
+                                    {{ tag.name }}
+                                </a>
+                            {% else %}
+                                <a href="/tasks?tag_id={{ tag.id }}"
+                                   class="list-group-item list-group-item-action{{ ' text-white' if is_dark(tag.color) else '' }}"
+                                   style="background-color: {{ tag.color }}"
+                                >
+                                    {{ tag.name }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <a href="/tags" class="btn btn-primary btn-block mt-3">Управление</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-8">
+            <div class="card">
+                <div class="card-body">
+                <div class="d-flex flex-row mb-2 align-items-center">
+                    <h4 class="mb-0">Задачи</h4>
+                    <div class="flex-fill"></div>
+                    <a href="/tasks/new" class="btn btn-success">+ Создать</a>
+                </div>
+                    {% for task in tasks %}
+                        <a href="/tasks/{{ task.id }}" class="list-group-item list-group-item-action">
+                            {% if task.finished %}
+                                <s>{{ task.title }}</s>
+                                <br/>
+                            {% else %}
+                                <h5 class="mb-0">{{ task.title }}</h5>
+                            {% endif %}
+                            {% if task.deadline %}
+                                {% if task.deadline_in.days >= 0 %}
+                                    <small class="{{ 'text-secondary' if task.deadline_in.days >= 3 else 'text-danger' }}">
+                                        дедлайн через {{ task.deadline_in.days }} дн.
+                                    </small>
+                                {% else %}
+                                    <small class="text-danger"><b>дедлайн был {{ -task.deadline_in.days }} дн. назад</b></small>
+                                {% endif %}
+                            {% endif %}
+                            <div class="text-secondary">
+                                {{ task.content | truncate }}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

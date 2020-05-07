@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+
+        <p>
+            {{ form.title.label }}
+            {{ form.title(class='form-control') }}
+        </p>
+        <p>
+            {{ form.content.label }}
+            {{ form.content(class='form-control') }}
+        </p>
+        <p>
+            {{ form.priority.label }}
+            {{ form.priority(class='form-control') }}
+        </p>
+        <p>
+            {{ form.tags.label }}
+            <small>(Ctrl чтобы выбрать несколько)</small>
+            <a href="/tags/new?back={{ request.path }}">+ Добавить</a>
+            {{ form.tags(class='form-control') }}
+        </p>
+        <p>
+            {{ form.has_deadline }}
+            {{ form.has_deadline.label }}
+        </p>
+        <p id="deadline-input" style="display: none">
+            {{ form.deadline.label }}
+            {{ form.deadline(class='form-control', type='date') }}
+        </p>
+        <p>
+            {{ form.has_place }}
+            {{ form.has_place.label }}
+        </p>
+        <p id="place-input" style="display: none">
+            {{ form.place.label }}
+            {{ form.place(class='form-control') }}
+        </p>
+
+        <div class="text-center">
+            {{ form.submit(type="submit", class="btn btn-primary px-5") }}
+        </div>
+    </form>
+    <script>
+    var deadlineInput = $('#deadline-input')
+    var hasDeadline = $('#has_deadline')
+    var placeInput = $('#place-input')
+    var hasPlace = $('#has_place')
+    hasDeadline.change(function() {
+        deadlineInput[hasDeadline[0].checked ? 'show' : 'hide']()
+    })
+    hasPlace.change(function() {
+        placeInput[hasPlace[0].checked ? 'show' : 'hide']()
+    })
+    deadlineInput[hasDeadline[0].checked ? 'show' : 'hide']()
+    placeInput[hasPlace[0].checked ? 'show' : 'hide']()
+    </script>
+{% endblock %}

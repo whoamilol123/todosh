@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Привет, {{ current_user.username }}.</h1>
+    <p class="text-secondary">Дата регистрации: {{ current_user.registration_date.strftime('%m/%d/%Y') }}</p>
+    <div class="row">
+        <div class="col-md-6 col-12">
+            <div class="card my-2">
+                <div class="card-body">
+                    <h5 class="card-title">Сменить пароль</h5>
+                    <div class="card-text">
+                        <div class="alert alert-danger mb-3" style="display: none;" id="pwd-error">
+                            Пароли не совпадают
+                        </div>
+                        <div class="alert alert-success mb-3" style="display: none;" id="pwd-success">
+                            Пароль изменен!
+                        </div>
+                        <form id="pwd-form">
+                            <p>
+                                <label for="new-pwd">Новый пароль</label>
+                                <input class="form-control" name="password" type="password" required id="new-pwd">
+                            </p>
+                            <p>
+                                <label for="new-pwd2">Повторите новый пароль</label>
+                                <input class="form-control" name="password2" type="password" required id="new-pwd2">
+                            </p>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary px-5">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-12">
+            <div class="card my-2">
+                <div class="card-body">
+                    <div class="alert alert-success mb-3" style="display: none;" id="tg-success">
+                        Сохранено!
+                    </div>
+                    <h5 class="card-title">Уведомления в Telegram</h5>
+                    <p class="card-subtitle text-secondary">
+                        Каждый день в 7:00 будет приходить сообщение с задачами на ближайшее время.
+                    </p>
+                    <div class="card-text mt-2">
+                        <label for="telegram-id-input">ID в Telegram</label>
+                        <input type="text" class="form-control" id="telegram-id-input" value="{{ current_user.telegram_id or '' }}">
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary px-5" id="telegram-id-save">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#pwd-form').submit(function (e) {
+            e.preventDefault()
+
+            $('#pwd-error').hide()
+            $('#pwd-success').hide()
+
+            var form = $(this)
+            var password = null
+            var password2 = null
+            form.serializeArray().forEach(function (it) {
+                if (it.name === 'password') password = it.value
+                if (it.name === 'password2') password2 = it.value
+            })
+
+            if (password !== password2) {
+                $('#pwd-error').show()
+                return
+            }
+
+            form.find('input, button').each((i, it) => $(it).attr('disabled', true))
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/users/{{ current_user.id }}',
+                data: 'password=' + encodeURIComponent(password),
+                success: function () {
+                    form.find('input, button').each((i, it) => $(it).attr('disabled', false))
+                    $('#pwd-success').show()
+                }
+            })
+        })
+        $('#telegram-id-save').click(function () {
+            $('#tg-success').hide()
+            $.ajax({
+                method: 'POST',
+                url: '/api/users/{{ current_user.id }}',
+                data: 'telegram_id=' + encodeURIComponent($('#telegram-id-input').val()),
+                success: function () {
+                    $('#tg-success').show()
+                }
+            })
+        })
+    </script>
+{% endblock %}

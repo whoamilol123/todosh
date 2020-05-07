@@ -1,0 +1,12 @@
+.tag.dark {
+    color: white;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 6px 0px #0000007a;
+    color: black;
+    margin: 4px;
+    display: inline-block;
+}

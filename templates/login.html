@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form action="/login" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+
+        <p>
+            {{ form.username.label }}
+            {{ form.username(class='form-control') }}
+        </p>
+        <p>
+            {{ form.password.label }}
+            {{ form.password(class='form-control') }}
+        </p>
+
+        <div class="text-center">
+            {{ form.submit(type="submit", class="btn btn-primary px-5") }}
+        </div>
+    </form>
+{% endblock %}

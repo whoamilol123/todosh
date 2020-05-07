@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex flex-row">
+                <div class="flex-fill"></div>
+                <a href="/tags/new" class="btn btn-success">+ Создать</a>
+            </div>
+            <div class="list-group mt-2">
+                {% for tag in tags %}
+                    <div class="d-flex flex-row my-1">
+                        <a href="/tasks?tag_id={{ tag.id }}"
+                           class=" flex-grow-1 list-group-item list-group-item-action{{ ' text-white' if is_dark(tag.color) else '' }}"
+                           style="background-color: {{ tag.color }}"
+                        >
+                            {{ tag.name }}
+                        </a>
+                        <a href="/tags/{{ tag.id }}/edit" class="btn btn-outline-primary flex-shrink-1 ml-2 d-flex flex-column justify-content-center">Изменить</a>
+                        <a href="/tags/{{ tag.id }}/delete" class="btn btn-outline-danger flex-shrink-1 ml-2 d-flex flex-column justify-content-center">Удалить</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

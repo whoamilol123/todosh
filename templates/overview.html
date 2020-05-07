@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-12">
+            <div class="card">
+                <div class="card-body">
+                    <a href="/tasks/new" class="btn btn-primary btn-block">Создать задачу</a>
+                    <a href="/tasks" class="btn btn-primary btn-block">Мои задачи</a>
+                    <a href="/tags" class="btn btn-primary btn-block">Мои теги</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ближайшие задачи</h5>
+                    <ul class="list-group">
+                        {% for task in upcoming %}
+                            <a href="/tasks/{{ task.id }}" class="list-group-item list-group-item-action">
+                                {{ task.title }}<br/>
+                                {% if task.deadline_in.days >= 0 %}
+                                    <small class="{{ 'text-secondary' if task.deadline_in.days >= 3 else 'text-danger' }}">
+                                        дедлайн через {{ task.deadline_in.days }} дн.
+                                    </small>
+                                {% else %}
+                                    <small class="text-danger"><b>дедлайн был {{ -task.deadline_in.days }} дн. назад</b></small>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </ul>
+                    {% if not upcoming %}
+                        <div class="py-4 text-secondary text-center">
+                            Тут пусто...<br/>
+                            <a href="/tasks/new">+ Создать задачу</a>
+                        </div>
+                    {% endif %}
+                    <hr>
+                    <div class="d-flex flex-row">
+                        <div class="flex-fill"></div>
+                        <a href="/tasks" class="card-link">Показать все &gt;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
